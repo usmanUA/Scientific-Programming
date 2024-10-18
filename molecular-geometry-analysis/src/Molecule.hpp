@@ -1,9 +1,23 @@
 
 
-#include <map>
 #include <string>
 #include <vector>
 using namespace std;
+
+inline	double	atomic_mass[] = {
+	0.000000,
+	1.007825,
+	4.002603,  
+	6.015123,
+	9.012183,
+	11.009305,
+	12.000000,
+	14.003074,
+	15.994914,
+	18.998403,
+	19.992440,
+	22.989769,
+};
 
 class	Molecule
 {
