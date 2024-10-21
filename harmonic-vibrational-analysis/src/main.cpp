@@ -14,6 +14,7 @@ int main(int argc, char *argv[])
 		char	file[25] = "../input/h2o_hessian.txt";
 		mol.save_hessian(argv[2]);
 		mol.mass_weight_hessian();
+		mol.diagonalize_mw_hessian();
 	}
 	return 0;
 }

@@ -28,7 +28,10 @@ Molecule::Molecule(string filename, int q)
 
 Molecule::~Molecule()
 {
-	delete []this->H;
+	for (int i = 0; i < natoms*3; i++) {
+		delete []this->H[i];
+	}
+	delete this->H;
 }
 
 void	Molecule::print_geom()
@@ -68,16 +71,19 @@ void	Molecule::save_hessian( char *filename )
 void	Molecule::mass_weight_hessian( void )
 {
 	cout << endl;
-	cout << "\t\t";
+	cout << "\t ";
 	for (int i = 0; i < natoms*3; i++) {
-		printf("%d\t\t", i+1);
+		printf("%d\t      ", i+1);
 	}
 	printf("\n\n");
+	int i_atom, j_atom;
 	for (int i = 0; i < natoms*3; i++) {
-		printf("%d\t\t", i+1);
+		printf("%d\t ", i+1);
+		i_atom = i/3;
 		for (int j = 0; j < natoms*3; j++) {
-			this->H[i][j] /= sqrt(atomic_mass[zvals[0]]*atomic_mass[zvals[1]]);
-			printf("%1.7f\t", this->H[i][j]);
+			j_atom = j/3;
+			this->H[i][j] /= sqrt(atomic_mass[zvals[i_atom]]*atomic_mass[zvals[j_atom]]);
+			printf("%10.7f  ", this->H[i][j]);
 		}
 		printf("\n\n");
 	}
@@ -85,7 +91,18 @@ void	Molecule::mass_weight_hessian( void )
 
 void	Molecule::diagonalize_mw_hessian( void )
 {
-
+	cout << endl;
+	Matrix	I(9,9);
+	
+	for (int i = 0; i < natoms*3; i++) {
+		for (int j = 0; j < natoms*3; j++) {
+			I(i,j) = H[i][j];
+		}
+	}
+	Eigen::SelfAdjointEigenSolver<Matrix> solver(I);
+	Matrix eigenvecs = solver.eigenvectors();
+	Matrix eigenvals = solver.eigenvalues();
+	cout << eigenvals << endl;
 }
 
 void	Molecule::harmonic_vibrational_frequencies( void )

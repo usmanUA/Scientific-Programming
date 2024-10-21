@@ -2,7 +2,12 @@
 
 #include <string>
 #include <vector>
+#include "../Eigen/Dense"
+#include "../Eigen/Eigenvalues"
+#include "../Eigen/Core"
 using namespace std;
+
+typedef	Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Matrix;
 
 inline	double	atomic_mass[] = {
 	0.000000,
