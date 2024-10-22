@@ -1,13 +1,7 @@
 
 #include "Molecule.hpp"
-#include <cassert>
-#include <cmath>
 #include <cstdio>
 #include <cstdlib>
-#include <fstream>
-#include <iostream>
-#include <ostream>
-#include <vector>
 
 Molecule::Molecule(string filename, int q)
 {
@@ -43,10 +37,11 @@ void	Molecule::print_geom()
 	}
 }
 
-void	Molecule::save_hessian( char *filename )
+void	Molecule::save_hessian( const char *filename )
 {
 	this->H = new double* [natoms*3];
 	FILE	*file;
+	int	atoms;
 //"../input/h2o_hessian.txt"
 	file = fopen(filename, "r");
 	if (!file) {
@@ -55,6 +50,11 @@ void	Molecule::save_hessian( char *filename )
 	}
 	for (int i = 0; i < natoms*3; i++) {
 		this->H[i] = new double [natoms*3];
+	}
+	fscanf(file, "%d", &atoms);
+	if (atoms != natoms) {
+		cout << "\033[31mProvided hessian matrix file does not match the input geometry\033[0m\n";
+		exit(1);
 	}
 	for (int i = 0; i < natoms*3; i++) {
 		for (int j = 0; j < natoms; j++) {
@@ -95,18 +95,27 @@ void	Molecule::diagonalize_mw_hessian( void )
 	Matrix	I(9,9);
 	
 	for (int i = 0; i < natoms*3; i++) {
-		for (int j = 0; j < natoms*3; j++) {
-			I(i,j) = H[i][j];
+		for (int j = 0; j < natoms; j++) {
+			I(i,3*j) = this->H[i][3*j];
+			I(i, 3*j+1) = this->H[i][3*j+1];
+			I(i, 3*j+2) = this->H[i][3*j+2];
 		}
 	}
 	Eigen::SelfAdjointEigenSolver<Matrix> solver(I);
 	Matrix eigenvecs = solver.eigenvectors();
 	Matrix eigenvals = solver.eigenvalues();
-	cout << eigenvals << endl;
+	for (int i = 0; i < natoms*3; i++) {
+		if (eigenvals(i) < 0.0000000001) {
+			eigenvals(i) = 0.0000000000;
+		}
+		printf("%d\t%10.10f\n", (natoms*3-1)-i, eigenvals((natoms*3-1)-i));
+	}
+	this->eigenvals = eigenvals;
 }
 
 void	Molecule::harmonic_vibrational_frequencies( void )
 {
-
+	for (int i = 0; i < natoms*3; i++) {
+		printf("%d\t%10.10f\n", (natoms*3-1)-i, 1302 * sqrt(eigenvals((natoms*3-1)-i))*4);
+	}
 }
-

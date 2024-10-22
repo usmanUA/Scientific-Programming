@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
+#include <fstream>
 #include "../Eigen/Dense"
 #include "../Eigen/Eigenvalues"
 #include "../Eigen/Core"
@@ -37,10 +39,11 @@ class	Molecule
 		vector<vector<double> >	geom;
 		string	point_group;
 		double	**H;
+		Matrix	eigenvals;
 
 	// NOTE: Molecule members
 		void	print_geom();
-		void	save_hessian( char *filename );
+		void	save_hessian( const char *filename );
 		void	mass_weight_hessian( void );
 		void	diagonalize_mw_hessian( void );
 		void	harmonic_vibrational_frequencies( void );
