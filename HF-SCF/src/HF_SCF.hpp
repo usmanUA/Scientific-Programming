@@ -21,7 +21,7 @@ class HFSCF
 		double	scf_E;
 		Matrix	S, T, V, H_core, ee;
 		Array	ERI;
-		Matrix	S_12, F, F_bar,D;
+		Matrix	S_12,F,D;
 		vector<int>	ioff;
 
 	// NOTE: Members of HFSCF

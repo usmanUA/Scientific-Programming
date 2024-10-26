@@ -12,7 +12,7 @@ HFSCF::HFSCF( const char* enuc, string s, string t, string v, string eriout )
 		ioff[i] = ioff[i-1] + i;
 	}
 	S.resize(7,7),T.resize(7,7),V.resize(7,7),ee.resize(7,7),ERI.resize(BIGNUM), S_12.resize(7,7);
-	D.resize(7,7),F_bar.resize(7,7),F.resize(7,7);
+	D.resize(7,7),F.resize(7,7);
 	FILE*	file = fopen(enuc, "r");
 	fscanf(file, "%lf", &E_nuc);
 	parse_one_e_integrals( s, S );	
@@ -84,16 +84,16 @@ void	HFSCF::ortogon_S( void )
 
 void	HFSCF::DensityMatrix( Matrix& F_matrix )
 {
-	F_bar = S_12.transpose() * F_matrix * S_12;
-	for (int i = 0; i < F_bar.size()/7; i++) {
-		for (int j = 0; j < F_bar.size()/7; j++) {
-			if (abs(F_bar(i,j)) < 1e-10){
-				F_bar(i,j) = 0.00000000;
+	F = S_12.transpose() * F_matrix * S_12;
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 7; j++) {
+			if (abs(F(i,j)) < 1e-10){
+				F(i,j) = 0.00000000;
 			}
 		}
 
 	}
-	Eigen::SelfAdjointEigenSolver<Matrix> solver(F_bar);
+	Eigen::SelfAdjointEigenSolver<Matrix> solver(F);
 	Matrix eigenvecs = solver.eigenvectors();
 	Matrix eigenvals = solver.eigenvalues();
 	eigenvecs = S_12 * eigenvecs;
@@ -105,7 +105,16 @@ void	HFSCF::DensityMatrix( Matrix& F_matrix )
 		}
 
 	}
-	D = eigenvecs * eigenvecs.transpose();
+	Matrix C = eigenvecs.leftCols(5);
+	D = C * C.transpose();
+	for (int i = 0; i < 7; i++) {
+		for (int j = 0; j < 7; j++) {
+			if (abs(D(i,j)) < 1e-10){
+				D(i,j) = 0.00000000;
+			}
+		}
+
+	}
 }
 
 void	HFSCF::SCF_E( Matrix& F_uv )
